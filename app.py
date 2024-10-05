@@ -36,12 +36,43 @@ def word_detail(word_id):
     conn = get_db_connection()
     word = conn.execute('SELECT * FROM words WHERE id = ?', (word_id,)).fetchone()
 
+    # 単語が登録されていない場合、登録ページにリダイレクト
     if word is None:
         return redirect(url_for('register'))
 
+    # コメントを取得する処理
     comments = conn.execute('SELECT * FROM comments WHERE word_id = ?', (word_id,)).fetchall()
     conn.close()
     return render_template('word_detail.html', word=word, comments=comments)
+@app.route('/word/<int:word_id>/edit', methods=['GET', 'POST'])
+def edit_word(word_id):
+    conn = get_db_connection()
+    word = conn.execute('SELECT * FROM words WHERE id = ?', (word_id,)).fetchone()
+
+    if word is None:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        # フォームからのデータを取得
+        name = request.form['name']
+        alias = request.form['alias']
+        abbreviation = request.form['abbreviation']
+        category = request.form['category']
+        description = request.form['description']
+
+        # データベースの単語を更新
+        conn.execute('UPDATE words SET name = ?, alias = ?, abbreviation = ?, category = ?, description = ? WHERE id = ?',
+                     (name, alias, abbreviation, category, description, word_id))
+        conn.commit()
+        conn.close()
+
+        # 単語詳細ページにリダイレクト
+        return redirect(url_for('word_detail', word_id=word_id))
+
+    conn.close()
+    return render_template('edit_word.html', word=word)
+
+
 
 @app.route('/word/<int:word_id>/comment', methods=['POST'])
 def add_comment(word_id):
@@ -51,6 +82,14 @@ def add_comment(word_id):
     conn.commit()
     conn.close()
     return redirect(url_for('word_detail', word_id=word_id))
+
+@app.route('/words')
+def word_list():
+    conn = get_db_connection()
+    words = conn.execute('SELECT * FROM words').fetchall()
+    conn.close()
+    return render_template('word_list.html', words=words)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -87,20 +126,21 @@ def init_db():
             abbreviation TEXT,
             category TEXT,
             description TEXT,
-            image TEXT
+            image TEXT  -- ここでimageカラムを追加
         )
     ''')
     c.execute('''
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY,
             word_id INTEGER,
-            user_comment TEXT,
+            content TEXT,
             likes INTEGER DEFAULT 0,
             FOREIGN KEY (word_id) REFERENCES words (id)
         )
     ''')
     conn.commit()
     conn.close()
+
 
 if __name__ == '__main__':
     init_db()

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>単語一覧</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>登録された単語の一覧</h1>
+
+    <ul>
+        {% for word in words %}
+            <li>
+                <a href="{{ url_for('word_detail', word_id=word.id) }}">{{ word.name }}</a> (カテゴリー: {{ word.category }})
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('index') }}">トップページに戻る</a>
+</body>
+</html>

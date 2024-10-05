@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>単語編集 - {{ word.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>単語編集</h1>
+
+    <form action="{{ url_for('edit_word', word_id=word['id']) }}" method="post">
+        <label for="name">単語名:</label>
+        <input type="text" id="name" name="name" value="{{ word.name }}" required><br>
+
+        <label for="alias">別称:</label>
+        <input type="text" id="alias" name="alias" value="{{ word.alias }}"><br>
+
+        <label for="abbreviation">略称:</label>
+        <input type="text" id="abbreviation" name="abbreviation" value="{{ word.abbreviation }}"><br>
+
+        <label for="category">カテゴリー:</label>
+        <input type="text" id="category" name="category" value="{{ word.category }}"><br>
+
+        <label for="description">説明:</label>
+        <textarea id="description" name="description">{{ word.description }}</textarea><br>
+
+        <input type="submit" value="保存">
+    </form>
+
+    <a href="{{ url_for('word_detail', word_id=word.id) }}">戻る</a>
+</body>
+</html>
