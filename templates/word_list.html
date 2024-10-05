@@ -4,15 +4,37 @@
     <meta charset="UTF-8">
     <title>単語一覧</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .word-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px; /* 各リスト項目の間にスペースを追加 */
+        }
+        .image-container {
+            display: flex; /* 画像を横に並べる */
+            flex-wrap: wrap; /* 画像がはみ出る場合に折り返す */
+        }
+        .image-container img {
+            width: 50px; /* 画像の幅 */
+            height: auto; /* 高さを自動調整 */
+            margin-right: 10px; /* 画像の間にスペースを追加 */
+            margin-bottom: 10px; /* 行間のスペースを追加 */
+        }
+    </style>
 </head>
 <body>
     <h1>登録された単語の一覧</h1>
 
     <ul>
         {% for word in words %}
-            <li>
-                <a href="{{ url_for('word_detail', word_id=word.id) }}">{{ word.name }}</a> (カテゴリー: {{ word.category }})
-            </li>
+        <li class="word-item">
+            <div class="image-container">
+                {% if word.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}">
+                {% endif %}
+            </div>
+            <a href="{{ url_for('word_detail', word_id=word.id) }}">{{ word.name }}</a> (カテゴリー: {{ word.category }})
+        </li>
         {% endfor %}
     </ul>
 

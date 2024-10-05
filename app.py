@@ -91,6 +91,16 @@ def word_list():
     return render_template('word_list.html', words=words)
 
 
+@app.route('/word/<int:word_id>/delete', methods=['POST'])
+def delete_word(word_id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM words WHERE id = ?', (word_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('word_list'))
+
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':

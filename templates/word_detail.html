@@ -4,15 +4,31 @@
     <meta charset="UTF-8">
     <title>{{ word.name }}の詳細</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .word-detail {
+            display: flex;
+            align-items: flex-start; /* 上揃え */
+        }
+        .word-info {
+            margin-left: 20px; /* 画像との間にスペースを追加 */
+        }
+        img {
+            width: 300px; /* 画像の幅 */
+            height: auto; /* 高さを自動調整 */
+        }
+    </style>
 </head>
 <body>
     <h1>{{ word.name }}</h1>
-    <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}" style="width: 300px; height: auto;">
-
-    <p>別称: {{ word.alias }}</p>
-    <p>略称: {{ word.abbreviation }}</p>
-    <p>カテゴリー: {{ word.category }}</p>
-    <p>説明: {{ word.description }}</p>
+    <div class="word-detail">
+        <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}">
+        <div class="word-info">
+            <p>別称: {{ word.alias }}</p>
+            <p>略称: {{ word.abbreviation }}</p>
+            <p>カテゴリー: {{ word.category }}</p>
+            <p>説明: {{ word.description }}</p>
+        </div>
+    </div>
 
     <h2>コメント</h2>
     <form action="{{ url_for('add_comment', word_id=word['id']) }}" method="post">
@@ -28,6 +44,12 @@
 
     <!-- 編集ボタンの追加 -->
     <a href="{{ url_for('edit_word', word_id=word.id) }}">編集</a>
+
+    <!-- 削除ボタンの追加 -->
+    <form action="{{ url_for('delete_word', word_id=word.id) }}" method="post" style="display:inline;">
+        <input type="submit" value="削除" onclick="return confirm('本当に削除しますか？');">
+    </form>
+
     <a href="/">戻る</a>
 </body>
 </html>
