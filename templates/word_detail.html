@@ -21,7 +21,11 @@
 <body>
     <h1>{{ word.name }}</h1>
     <div class="word-detail">
-        <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}">
+        {% if word.image %}
+            <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}">
+        {% else %}
+            <p>画像は登録されていません。</p>
+        {% endif %}
         <div class="word-info">
             <p>別称: {{ word.alias }}</p>
             <p>略称: {{ word.abbreviation }}</p>

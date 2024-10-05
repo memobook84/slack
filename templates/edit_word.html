@@ -8,7 +8,7 @@
 <body>
     <h1>単語編集</h1>
 
-    <form action="{{ url_for('edit_word', word_id=word['id']) }}" method="post">
+    <form action="{{ url_for('edit_word', word_id=word['id']) }}" method="post" enctype="multipart/form-data">
         <label for="name">単語名:</label>
         <input type="text" id="name" name="name" value="{{ word.name }}" required><br>
 
@@ -23,6 +23,14 @@
 
         <label for="description">説明:</label>
         <textarea id="description" name="description">{{ word.description }}</textarea><br>
+
+        {% if word.image %}
+            <p>現在の画像:</p>
+            <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}" style="width: 300px; height: auto;">
+        {% endif %}
+
+        <label for="image">新しい画像をアップロード (オプション):</label>
+        <input type="file" id="image" name="image"><br>
 
         <input type="submit" value="保存">
     </form>

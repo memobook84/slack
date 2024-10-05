@@ -36,14 +36,13 @@ def word_detail(word_id):
     conn = get_db_connection()
     word = conn.execute('SELECT * FROM words WHERE id = ?', (word_id,)).fetchone()
 
-    # 単語が登録されていない場合、登録ページにリダイレクト
     if word is None:
         return redirect(url_for('register'))
 
-    # コメントを取得する処理
     comments = conn.execute('SELECT * FROM comments WHERE word_id = ?', (word_id,)).fetchall()
     conn.close()
     return render_template('word_detail.html', word=word, comments=comments)
+
 @app.route('/word/<int:word_id>/edit', methods=['GET', 'POST'])
 def edit_word(word_id):
     conn = get_db_connection()
@@ -53,32 +52,34 @@ def edit_word(word_id):
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        # フォームからのデータを取得
         name = request.form['name']
         alias = request.form['alias']
         abbreviation = request.form['abbreviation']
         category = request.form['category']
         description = request.form['description']
+        image = request.files.get('image')
 
-        # データベースの単語を更新
-        conn.execute('UPDATE words SET name = ?, alias = ?, abbreviation = ?, category = ?, description = ? WHERE id = ?',
-                     (name, alias, abbreviation, category, description, word_id))
+        # 画像の処理
+        image_filename = word['image']  # デフォルトは既存の画像
+        if image and allowed_file(image.filename):
+            image_filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+
+        conn.execute('UPDATE words SET name = ?, alias = ?, abbreviation = ?, category = ?, description = ?, image = ? WHERE id = ?',
+                     (name, alias, abbreviation, category, description, image_filename, word_id))
         conn.commit()
         conn.close()
 
-        # 単語詳細ページにリダイレクト
         return redirect(url_for('word_detail', word_id=word_id))
 
     conn.close()
     return render_template('edit_word.html', word=word)
 
-
-
 @app.route('/word/<int:word_id>/comment', methods=['POST'])
 def add_comment(word_id):
     user_comment = request.form['user_comment']
     conn = get_db_connection()
-    conn.execute('INSERT INTO comments (word_id, user_comment) VALUES (?, ?)', (word_id, user_comment))
+    conn.execute('INSERT INTO comments (word_id, content) VALUES (?, ?)', (word_id, user_comment))
     conn.commit()
     conn.close()
     return redirect(url_for('word_detail', word_id=word_id))
@@ -90,7 +91,6 @@ def word_list():
     conn.close()
     return render_template('word_list.html', words=words)
 
-
 @app.route('/word/<int:word_id>/delete', methods=['POST'])
 def delete_word(word_id):
     conn = get_db_connection()
@@ -98,8 +98,6 @@ def delete_word(word_id):
     conn.commit()
     conn.close()
     return redirect(url_for('word_list'))
-
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -150,7 +148,6 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-
 
 if __name__ == '__main__':
     init_db()
