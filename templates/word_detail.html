@@ -6,11 +6,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>{{ word['name'] }}</h1>
-    <p>別称: {{ word['alias'] }}</p>
-    <p>略称: {{ word['abbreviation'] }}</p>
-    <p>カテゴリー: {{ word['category'] }}</p>
-    <p>説明: {{ word['description'] }}</p>
+    <h1>{{ word.name }}</h1>
+    <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}"style="width: 300px; height: auto;">
+
+<p>別称: {{ word.alias }}</p>
+<p>略称: {{ word.abbreviation }}</p>
+<p>カテゴリー: {{ word.category }}</p>
+<p>説明: {{ word.description }}</p>
+
 
     <h2>コメント</h2>
    <!-- コメント投稿フォーム -->

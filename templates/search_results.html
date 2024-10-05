@@ -9,9 +9,11 @@
     <h1>検索結果</h1>
     <ul>
         {% for word in words %}
-            <li>
-                <a href="{{ url_for('word_detail', word_id=word['id']) }}">{{ word['name'] }}</a> (カテゴリー: {{ word['category'] }})
-            </li>
+        <li>
+            <a href="{{ url_for('word_detail', word_id=word.id) }}">{{ word.name }}</a>
+            <!-- 画像を表示 -->
+            <img src="{{ url_for('static', filename='uploads/' + word.image) }}" alt="{{ word.name }}" style="width: 100px; height: auto;">
+        </li>
         {% endfor %}
     </ul>
 

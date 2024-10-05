@@ -1,12 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/')
 def index():
@@ -29,7 +36,6 @@ def word_detail(word_id):
     conn = get_db_connection()
     word = conn.execute('SELECT * FROM words WHERE id = ?', (word_id,)).fetchone()
 
-    # 単語が登録されていない場合、登録ページにリダイレクト
     if word is None:
         return redirect(url_for('register'))
 
@@ -39,7 +45,7 @@ def word_detail(word_id):
 
 @app.route('/word/<int:word_id>/comment', methods=['POST'])
 def add_comment(word_id):
-    user_comment = request.form['user_comment']  # フォームからの入力を取得
+    user_comment = request.form['user_comment']
     conn = get_db_connection()
     conn.execute('INSERT INTO comments (word_id, user_comment) VALUES (?, ?)', (word_id, user_comment))
     conn.commit()
@@ -54,10 +60,16 @@ def register():
         abbreviation = request.form['abbreviation']
         category = request.form['category']
         description = request.form['description']
+        image = request.files.get('image')
+
+        image_filename = None
+        if image and allowed_file(image.filename):
+            image_filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
 
         conn = get_db_connection()
-        conn.execute('INSERT INTO words (name, alias, abbreviation, category, description) VALUES (?, ?, ?, ?, ?)',
-                     (name, alias, abbreviation, category, description))
+        conn.execute('INSERT INTO words (name, alias, abbreviation, category, description, image) VALUES (?, ?, ?, ?, ?, ?)',
+                     (name, alias, abbreviation, category, description, image_filename))
         conn.commit()
         conn.close()
         return redirect(url_for('index'))
@@ -74,7 +86,8 @@ def init_db():
             alias TEXT,
             abbreviation TEXT,
             category TEXT,
-            description TEXT
+            description TEXT,
+            image TEXT
         )
     ''')
     c.execute('''
@@ -90,5 +103,5 @@ def init_db():
     conn.close()
 
 if __name__ == '__main__':
-    init_db()  # アプリケーションの起動時にデータベースを初期化
+    init_db()
     app.run(debug=True)
