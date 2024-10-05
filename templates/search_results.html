@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>検索結果</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>検索結果</h1>
+    <ul>
+        {% for word in words %}
+            <li>
+                <a href="{{ url_for('word_detail', word_id=word['id']) }}">{{ word['name'] }}</a> (カテゴリー: {{ word['category'] }})
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if not words %}
+        <p>登録されていない単語です。<a href="{{ url_for('register') }}">こちらから登録してください。</a></p>
+    {% endif %}
+
+    <a href="/">戻る</a>
+</body>
+</html>

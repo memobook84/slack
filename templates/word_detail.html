@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ word['name'] }}の詳細</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>{{ word['name'] }}</h1>
+    <p>別称: {{ word['alias'] }}</p>
+    <p>略称: {{ word['abbreviation'] }}</p>
+    <p>カテゴリー: {{ word['category'] }}</p>
+    <p>説明: {{ word['description'] }}</p>
+
+    <h2>コメント</h2>
+   <!-- コメント投稿フォーム -->
+<form action="{{ url_for('add_comment', word_id=word['id']) }}" method="post">
+    <textarea name="user_comment" placeholder="コメントを入力"></textarea>
+    <input type="submit" value="コメント追加">
+</form>
+
+
+    <ul>
+        {% for comment in word.comments %}
+            <li>{{ comment['content'] }} (いいね数: {{ comment['likes'] }})</li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">戻る</a>
+</body>
+</html>

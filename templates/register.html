@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>単語登録</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>単語登録</h1>
+    <form action="/register" method="POST">
+        <label for="name">単語名:</label>
+        <input type="text" name="name" required>
+        <br>
+        <label for="alias">別称:</label>
+        <input type="text" name="alias">
+        <br>
+        <label for="abbreviation">略称:</label>
+        <input type="text" name="abbreviation">
+        <br>
+        <label for="category">カテゴリー:</label>
+        <input type="text" name="category" required>
+        <br>
+        <label for="description">説明:</label>
+        <textarea name="description" required></textarea>
+        <br>
+        <button type="submit">登録</button>
+    </form>
+    <a href="/">戻る</a>
+</body>
+</html>
